@@ -1,0 +1,135 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Departments - Hospital System</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}" />
+  </head>
+  <body class="bg-light">
+    <div th:replace="~{fragments/adminnav :: nav('departments')}"></div>
+
+    <div class="container mt-4">
+      <h3>Departments</h3>
+
+      <div
+        class="alert alert-success"
+        th:if="${success}"
+        th:text="${success}"
+      ></div>
+      <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h6 class="mb-3">Add Department</h6>
+          <form
+            th:action="@{/admin/departments/add}"
+            method="post"
+            class="row g-2 align-items-end"
+          >
+            <div class="col-md-4">
+              <label class="form-label">Name</label>
+              <input
+                type="text"
+                class="form-control"
+                name="name"
+                required
+                maxlength="100"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Description</label>
+              <input
+                type="text"
+                class="form-control"
+                name="description"
+                maxlength="500"
+              />
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary w-100">Add</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 25%">Name</th>
+                <th style="width: 45%">Description</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- HTML forbids wrapping a <tr> in a <form>, so instead each row's
+                             inputs carry form="rowIdN" pointing at an empty form element.
+                             (The little-known HTML 'form' attribute!) -->
+              <tr th:each="d : ${departments}">
+                <td>
+                  <form
+                    th:attr="id='editDept' + ${d.id}"
+                    th:action="@{/admin/departments/edit}"
+                    method="post"
+                  ></form>
+                  <input
+                    type="hidden"
+                    name="id"
+                    th:value="${d.id}"
+                    th:attr="form='editDept' + ${d.id}"
+                  />
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    name="name"
+                    th:value="${d.name}"
+                    th:attr="form='editDept' + ${d.id}"
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    name="description"
+                    th:value="${d.description}"
+                    th:attr="form='editDept' + ${d.id}"
+                    maxlength="500"
+                  />
+                </td>
+                <td>
+                  <button
+                    type="submit"
+                    class="btn btn-sm btn-outline-primary"
+                    th:attr="form='editDept' + ${d.id}"
+                  >
+                    Save
+                  </button>
+                  <form
+                    th:action="@{/admin/departments/delete}"
+                    method="post"
+                    class="d-inline"
+                    onsubmit="return confirm('Delete this department?');"
+                  >
+                    <input type="hidden" name="id" th:value="${d.id}" />
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{fragments/navbar :: scripts}"></div>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <!-- The brand panel shared by ALL auth pages.
+         d-none d-lg-flex = hidden on phones (full-width form there instead). -->
+    <div
+      class="col-lg-6 d-none d-lg-flex bg-primary text-white flex-column justify-content-center p-5"
+      th:fragment="panel"
+    >
+      <a
+        th:href="@{/}"
+        class="text-white text-decoration-none fs-4 fw-bold mb-4"
+        >🏥 Hospital System</a
+      >
+      <h1 class="display-6 fw-bold">
+        Book appointments.<br />Manage your health records.
+      </h1>
+      <p class="lead opacity-75 mt-3 mb-0">
+        Schedule consultations with our doctors, track your appointment history,
+        and access your prescriptions — all in one place.
+      </p>
+      <a th:href="@{/}" class="text-white-50 text-decoration-none mt-4"
+        >← Back to home</a
+      >
+    </div>
+  </body>
+</html>

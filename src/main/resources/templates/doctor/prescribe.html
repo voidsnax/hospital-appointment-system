@@ -1,0 +1,245 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prescription - Hospital System</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}" />
+  </head>
+  <body class="bg-light">
+    <div th:replace="~{fragments/doctornav :: nav('appointments')}"></div>
+
+    <div class="container mt-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <h5>
+                <span
+                  th:text="${prescription == null} ? 'Prescription for' : 'Editing prescription for'"
+                ></span>
+                <span th:text="${appointment.patient.fullName}"></span>
+              </h5>
+              <p class="text-muted mb-0">
+                📅
+                <span
+                  th:text="${#temporals.format(appointment.appointmentDate, 'dd MMM yyyy')}"
+                ></span>
+                · ⏰
+                <span
+                  th:text="${#temporals.format(appointment.startTime, 'HH:mm')}"
+                ></span>
+                · <span class="badge text-bg-secondary">COMPLETED</span>
+              </p>
+              <p class="mb-0 mt-1 small" th:if="${appointment.reason}">
+                <strong>Reason for visit:</strong>
+                <span th:text="${appointment.reason}"></span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Action URL depends on mode -->
+          <form
+            th:action="${prescription == null} ? @{/doctor/prescribe} : @{/doctor/prescribe/edit}"
+            method="post"
+          >
+            <!-- Exactly ONE of these renders -->
+            <input
+              type="hidden"
+              name="appointmentId"
+              th:if="${prescription == null}"
+              th:value="${appointment.id}"
+            />
+            <input
+              type="hidden"
+              name="prescriptionId"
+              th:if="${prescription != null}"
+              th:value="${prescription.id}"
+            />
+
+            <div class="card shadow-sm mb-3">
+              <div class="card-body">
+                <div class="mb-3">
+                  <label class="form-label">Diagnosis *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="diagnosis"
+                    required
+                    maxlength="500"
+                    placeholder="e.g. Viral fever with throat infection"
+                    th:value="${prescription != null} ? ${prescription.diagnosis} : ''"
+                  />
+                </div>
+                <div class="mb-0">
+                  <label class="form-label">Notes / Advice</label>
+                  <textarea
+                    class="form-control"
+                    name="notes"
+                    rows="2"
+                    maxlength="1000"
+                    placeholder="e.g. Rest, drink plenty of fluids. Review after 5 days."
+                    th:text="${prescription != null} ? ${prescription.notes} : ''"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="card shadow-sm mb-3">
+              <div class="card-body">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
+                  <h6 class="mb-0">Medicines</h6>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    onclick="addMedRow()"
+                  >
+                    + Add Medicine
+                  </button>
+                </div>
+
+                <div id="medRows">
+                  <!-- EDIT MODE: one row per existing medicine.
+                                     The safe-navigation operator ?. evaluates to null
+                                     when prescription is null, and th:each treats null
+                                     as zero iterations — no th:block needed. -->
+                  <div
+                    class="row med-row mb-2"
+                    th:each="m : ${prescription?.medicines}"
+                  >
+                    <div class="col-md-4">
+                      <input
+                        name="medicineName"
+                        class="form-control"
+                        maxlength="200"
+                        placeholder="Medicine name *"
+                        th:value="${m.medicineName}"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <input
+                        name="dosage"
+                        class="form-control"
+                        placeholder="1-0-1"
+                        th:value="${m.dosage}"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <input
+                        name="duration"
+                        class="form-control"
+                        placeholder="5 days"
+                        th:value="${m.duration}"
+                      />
+                    </div>
+                    <div class="col-md-3">
+                      <input
+                        name="instructions"
+                        class="form-control"
+                        placeholder="After food"
+                        th:value="${m.instructions}"
+                      />
+                    </div>
+                    <div class="col-md-1">
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        onclick="removeMedRow(this)"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- CREATE MODE: one empty starter row -->
+                  <div class="row med-row mb-2" th:if="${prescription == null}">
+                    <div class="col-md-4">
+                      <input
+                        name="medicineName"
+                        class="form-control"
+                        maxlength="200"
+                        placeholder="Medicine name *"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <input
+                        name="dosage"
+                        class="form-control"
+                        placeholder="1-0-1"
+                      />
+                    </div>
+                    <div class="col-md-2">
+                      <input
+                        name="duration"
+                        class="form-control"
+                        placeholder="5 days"
+                      />
+                    </div>
+                    <div class="col-md-3">
+                      <input
+                        name="instructions"
+                        class="form-control"
+                        placeholder="After food"
+                      />
+                    </div>
+                    <div class="col-md-1">
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        onclick="removeMedRow(this)"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <p class="text-muted small mb-0">
+                  Rows with an empty medicine name are ignored.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              th:text="${prescription == null} ? 'Save Prescription' : 'Update Prescription'"
+            ></button>
+            <a
+              th:if="${prescription == null}"
+              th:href="@{/doctor/appointments}"
+              class="btn btn-outline-secondary"
+              >Cancel</a
+            >
+            <a
+              th:if="${prescription != null}"
+              th:href="@{/doctor/prescriptions/{id}(id=${prescription.id})}"
+              class="btn btn-outline-secondary"
+              >Cancel</a
+            >
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function addMedRow() {
+        const container = document.getElementById("medRows");
+        const clone = container.querySelector(".med-row").cloneNode(true);
+        clone.querySelectorAll("input").forEach((input) => (input.value = ""));
+        container.appendChild(clone);
+      }
+      function removeMedRow(btn) {
+        const container = document.getElementById("medRows");
+        if (container.querySelectorAll(".med-row").length > 1) {
+          btn.closest(".med-row").remove();
+        }
+      }
+    </script>
+  </body>
+</html>

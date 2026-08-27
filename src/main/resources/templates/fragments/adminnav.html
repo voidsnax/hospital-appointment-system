@@ -1,0 +1,76 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-dark"
+      th:fragment="nav(active)"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/admin/dashboard}"
+          >🏥 Hospital System — Admin</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#adminNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="adminNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                th:classappend="${active=='dashboard'}?'active':''"
+                th:href="@{/admin/dashboard}"
+                >Dashboard</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                th:classappend="${active=='doctors'}?'active':''"
+                th:href="@{/admin/doctors}"
+                >Doctors</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                th:classappend="${active=='departments'}?'active':''"
+                th:href="@{/admin/departments}"
+                >Departments</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                th:classappend="${active=='patients'}?'active':''"
+                th:href="@{/admin/patients}"
+                >Patients</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                th:classappend="${active=='appointments'}?'active':''"
+                th:href="@{/admin/appointments}"
+                >Appointments</a
+              >
+            </li>
+          </ul>
+          <div class="d-flex align-items-center">
+            <span class="navbar-text me-3" sec:authentication="name"></span>
+            <form th:action="@{/logout}" method="post">
+              <button type="submit" class="btn btn-light btn-sm">Logout</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </body>
+</html>

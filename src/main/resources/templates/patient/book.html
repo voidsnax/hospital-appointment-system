@@ -1,0 +1,137 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment - Hospital System</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}" />
+  </head>
+  <body class="bg-light">
+    <div th:replace="~{fragments/navbar :: nav('doctors')}"></div>
+
+    <div class="container mt-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-7">
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <h4 th:text="${doctor.user.fullName}">Dr. Name</h4>
+              <p
+                class="mb-1 text-muted"
+                th:text="${doctor.specialization} + ' · ' + ${doctor.department.name}"
+              ></p>
+              <p class="mb-0">
+                Consultation fee:
+                <strong
+                  >₹<span th:text="${doctor.consultationFee}"></span
+                ></strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- STEP 1: pick a date (GET form — resubmits to this same page with slots) -->
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-3 text-muted">
+                Step 1 — Choose a date
+              </h6>
+              <form
+                th:action="@{/patient/book}"
+                method="get"
+                class="row g-2 align-items-end"
+              >
+                <input type="hidden" name="doctorId" th:value="${doctor.id}" />
+                <div class="col-auto">
+                  <label class="form-label">Date</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    name="date"
+                    th:min="${today}"
+                    th:max="${maxDate}"
+                    th:value="${date}"
+                    required
+                  />
+                </div>
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-primary">
+                    Check Slots
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- STEP 2: pick a slot (only shown after a date is chosen) -->
+          <div class="card shadow-sm" th:if="${date != null}">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-3 text-muted">
+                Step 2 — Available slots on
+                <span
+                  th:text="${#temporals.format(date, 'dd MMM yyyy')}"
+                ></span>
+              </h6>
+
+              <div
+                class="alert alert-warning py-2"
+                th:if="${#lists.isEmpty(slots)}"
+              >
+                No free slots on this date — the doctor may not be available.
+                Try another date.
+              </div>
+
+              <form
+                th:action="@{/patient/appointments}"
+                method="post"
+                th:if="${!#lists.isEmpty(slots)}"
+              >
+                <input type="hidden" name="doctorId" th:value="${doctor.id}" />
+                <input type="hidden" name="date" th:value="${date}" />
+
+                <div class="row g-2 mb-3">
+                  <div class="col-auto" th:each="slot : ${slots}">
+                    <div class="form-check border rounded px-3 py-2">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="startTime"
+                        th:value="${slot}"
+                        th:id="'slot' + ${slot}"
+                        required
+                      />
+                      <label
+                        class="form-check-label"
+                        th:for="'slot' + ${slot}"
+                        th:text="${#temporals.format(slot, 'HH:mm')}"
+                        >09:00</label
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Reason for visit (optional)</label>
+                  <textarea
+                    class="form-control"
+                    name="reason"
+                    rows="2"
+                    placeholder="e.g. Fever and cold since 2 days"
+                  ></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                  Confirm Booking
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{fragments/navbar :: scripts}"></div>
+  </body>
+</html>
