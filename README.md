@@ -123,61 +123,70 @@ enter — use a real inbox when testing those flows._
 ### Screenshots
 
 <div align="center">
-  <p style="font-weight: 600; font-size: 1.1em;">Admin Dashboard</p>
+  <h4>Admin Dashboard</h4>
   <img src="docs/images/admin-dashboard.png">
 </div>
 
 <table>
   <tr>
-    <td align="center" style="font-weight: 600;">Manage Doctors</td>
-    <td align="center" style="font-weight: 600;">Manage Departments</td>
+    <th>Manage Doctors</th>
+    <th>Manage Departments</th>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/images/admin-doctors.png"></td>
-    <td width="50%"><img src="docs/images/admin-departments.png"></td>
+    <td width="50%"><img src="docs/images/admin-doctors.png">
+    </td>
+    <td width="50%"><img src="docs/images/admin-departments.png">
+    </td>
   </tr>
   <tr>
-    <td align="center" style="font-weight: 600;">Manage Patients</td>
-    <td align="center" style="font-weight: 600;">Manage Appointments</td>
+    <th>Manage Patients</th>
+    <th>Manage Appointments</th>
   </tr>
-    <td width="50%"><img src="docs/images/admin-patients.png"></td>
-    <td width="50%"><img src="docs/images/admin-appointments.png"></td>
+  <tr>
+    <td width="50%"><img src="docs/images/admin-patients.png">
+    </td>
+    <td width="50%"><img src="docs/images/admin-appointments.png">
+    </td>
   </tr>
 </table>
 
 <br>
 
 <div align="center">
-  <p style="font-weight: 600; font-size: 1.1em;">Doctor Dashboard</p>
+  <h4>Doctor Dashboard</h4>
   <img src="docs/images/doctor-dashboard.png">
 </div>
 
 <table>
   <tr>
-    <td align="center" style="font-weight: 600;">Manage Appointments</td>
-    <td align="center" style="font-weight: 600;">Manage Prescriptions</td>
+    <th>Manage Appointments</th>
+    <th>Manage Prescriptions</th>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/images/doctor-appointments.png"></td>
-    <td width="50%"><img src="docs/images/doctor-prescriptions.png"></td>
+    <td width="50%"><img src="docs/images/doctor-appointments.png">
+    </td>
+    <td width="50%"><img src="docs/images/doctor-prescriptions.png">
+    </td>
   </tr>
 </table>
 
 <br>
 
 <div align="center">
-  <p style="font-weight: 600; font-size: 1.1em;">Patient Dashboard</p>
+  <h4>Patient Dashboard</h4>
   <img src="docs/images/patient-dashboard.png">
 </div>
 
 <table>
   <tr>
-    <td align="center" style="font-weight: 600;">Book Appointments</td>
-    <td align="center" style="font-weight: 600;">View/download Prescriptions</td>
+    <th>Book Appointments</th>
+    <th>View/Download Prescriptions</th>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/images/booking.png"></td>
-    <td width="50%"><img src="docs/images/prescriptions.png"></td>
+    <td width="50%"><img src="docs/images/booking.png">
+    </td>
+    <td width="50%"><img src="docs/images/prescriptions.png">
+    </td>
   </tr>
 </table>
 
