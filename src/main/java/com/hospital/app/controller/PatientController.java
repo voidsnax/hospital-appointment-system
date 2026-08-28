@@ -1,28 +1,31 @@
 package com.hospital.app.controller;
 
+import com.hospital.app.entity.Appointment;
 import com.hospital.app.entity.AppointmentStatus;
-import com.hospital.app.repository.PrescriptionRepository;
 import com.hospital.app.entity.Doctor;
+import com.hospital.app.entity.DoctorSchedule;
 import com.hospital.app.entity.Gender;
 import com.hospital.app.entity.PatientProfile;
 import com.hospital.app.entity.User;
-import com.hospital.app.entity.Appointment;
 import com.hospital.app.repository.AppointmentRepository;
 import com.hospital.app.repository.DepartmentRepository;
 import com.hospital.app.repository.DoctorRepository;
+import com.hospital.app.repository.DoctorScheduleRepository;
 import com.hospital.app.repository.PatientProfileRepository;
+import com.hospital.app.repository.PrescriptionRepository;
 import com.hospital.app.repository.UserRepository;
 import com.hospital.app.service.AppointmentService;
+import com.hospital.app.service.PrescriptionViewService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import com.hospital.app.service.PrescriptionViewService;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +37,7 @@ public class PatientController {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
     private final DoctorRepository doctorRepository;
+    private final DoctorScheduleRepository scheduleRepository;
     private final PatientProfileRepository patientProfileRepository;
     private final AppointmentRepository appointmentRepository;
     private final AppointmentService appointmentService;
@@ -43,6 +47,7 @@ public class PatientController {
     public PatientController(UserRepository userRepository,
             DepartmentRepository departmentRepository,
             DoctorRepository doctorRepository,
+            DoctorScheduleRepository scheduleRepository,
             PatientProfileRepository patientProfileRepository,
             AppointmentRepository appointmentRepository,
             AppointmentService appointmentService,
@@ -51,6 +56,7 @@ public class PatientController {
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.doctorRepository = doctorRepository;
+        this.scheduleRepository = scheduleRepository;
         this.patientProfileRepository = patientProfileRepository;
         this.appointmentRepository = appointmentRepository;
         this.appointmentService = appointmentService;
@@ -94,6 +100,7 @@ public class PatientController {
 
     // ---------------- BOOKING ----------------
 
+    @SuppressWarnings("null")
     @GetMapping("/book")
     public String book(@RequestParam Long doctorId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -103,6 +110,12 @@ public class PatientController {
         model.addAttribute("doctor", doctor);
         model.addAttribute("today", LocalDate.now());
         model.addAttribute("maxDate", LocalDate.now().plusDays(AppointmentService.MAX_DAYS_AHEAD));
+
+        // This doctor's weekly availability, ordered Mon→Sun
+        List<DoctorSchedule> schedules = scheduleRepository.findByDoctorId(doctor.getId());
+        schedules.sort(Comparator.comparing(DoctorSchedule::getDayOfWeek));
+        model.addAttribute("schedules", schedules);
+
         if (date != null) {
             model.addAttribute("date", date);
             model.addAttribute("slots", appointmentService.getAvailableSlots(doctorId, date));
@@ -134,12 +147,12 @@ public class PatientController {
 
     @GetMapping("/appointments")
     public String myAppointments(Principal principal, Model model) {
-        List<Appointment> appts = appointmentRepository // was: List<com.hospital.app.entity.Appointment>
+        List<Appointment> appts = appointmentRepository
                 .findByPatientIdOrderByAppointmentDateDescStartTimeAsc(currentUser(principal).getId());
         model.addAttribute("appointments", appts);
 
         Map<Long, Long> rxIdMap = new HashMap<>();
-        for (Appointment a : appts) { // was: var a (fine too, but be consistent)
+        for (Appointment a : appts) {
             prescriptionRepository.findByAppointmentId(a.getId())
                     .ifPresent(rx -> rxIdMap.put(a.getId(), rx.getId()));
         }

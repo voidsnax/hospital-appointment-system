@@ -13,6 +13,7 @@
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>"
     > -->
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
   </head>
   <body class="bg-light">
     <!-- Simple top bar -->
@@ -29,7 +30,7 @@
     </nav>
 
     <!-- Hero -->
-    <div class="bg-primary text-white py-5">
+    <div class="hero-section text-white py-5">
       <div class="container py-4">
         <div class="row align-items-center g-4">
           <div class="col-lg-7">
@@ -66,8 +67,8 @@
       <h3 class="text-center mb-4">Our Departments</h3>
       <div class="row g-3 justify-content-center">
         <div class="col-md-4 col-lg-3" th:each="d : ${departments}">
-          <div class="card h-100 shadow-sm">
-            <div class="card-body">
+          <div class="card h-100 shadow-sm dept-card">
+            <div class="card-body p-4">
               <h5 class="card-title mb-2" th:text="${d.name}">Department</h5>
               <p
                 class="card-text text-muted small mb-0"

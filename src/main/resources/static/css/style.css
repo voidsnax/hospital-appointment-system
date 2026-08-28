@@ -1,0 +1,114 @@
+/* ============ Typography ============ */
+/* Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    /* One place to tune the whole app */
+    --hs-brand: #0d6efd;          /* Bootstrap primary — kept in sync */
+    --hs-brand-dark: #0a58ca;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Headings slightly tighter & bolder for a cleaner hierarchy */
+h1, h2, h3, h4, h5, h6 { font-weight: 600; letter-spacing: -0.02em; }
+
+/* ============ Navbar ============ */
+.navbar-brand { font-weight: 600; letter-spacing: -0.01em; }
+
+/* Active nav link: underline slide instead of default bg tint */
+.navbar .nav-link {
+    position: relative;
+    padding: 0.5rem 0.75rem;
+    transition: color 0.15s ease;
+}
+.navbar .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0.75rem; right: 0.75rem; bottom: 0.15rem;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    transform: scaleX(0);
+    transition: transform 0.15s ease;
+}
+.navbar .nav-link:hover::after,
+.navbar .nav-link.active::after { transform: scaleX(1); }
+.navbar .nav-link.active { color: #fff !important; }
+
+.navbar .navbar-text .badge {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    cursor: default;
+    font-weight: 400;
+}
+
+/* ============ Cards & buttons ============ */
+.card { border: none; }                       /* shadow does the separation now */
+.shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important; }
+
+.btn { transition: all 0.15s ease; }
+.btn:active { transform: translateY(1px); }   /* tactile press */
+
+/* ============ Tables ============ */
+/* Subtle row hover everywhere */
+.table-hover tbody tr { transition: background-color 0.1s ease; }
+/* Definition via header + row separators, not full grid borders */
+.table thead th {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(0, 0, 0, 0.55);
+}
+
+.table tbody td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);   /* whisper-thin row dividers */
+}
+
+/* last row: no divider, the card edge closes the table */
+.table tbody tr:last-child td { border-bottom: none; }
+
+/* table cards: give the table breathing room from the card edge */
+.card .table-responsive { padding: 0.25rem 0; }
+
+/* ============ Alerts ============ */
+.alert { border: none; }
+
+/* ============ Interactive cards ============ */
+/* Cards that are links (or contain links) lift on hover */
+a .card, a.card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+a:hover .card, a.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ============ Home hero ============ */
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* ============ Department cards (home) ============ */
+.card.dept-card {
+    border-top: 3px solid var(--hs-brand);
+}
+
+/* ============ Card headers ============ */
+.card-header {
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+}
+
+/* ============ Availability pills (booking page) ============ */
+.badge.rounded-pill.border {
+    font-weight: 500;
+}

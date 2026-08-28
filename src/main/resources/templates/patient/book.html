@@ -9,6 +9,7 @@
       rel="stylesheet"
     />
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
   </head>
   <body class="bg-light">
     <div th:replace="~{fragments/navbar :: nav('doctors')}"></div>
@@ -23,21 +24,40 @@
                 class="mb-1 text-muted"
                 th:text="${doctor.specialization} + ' · ' + ${doctor.department.name}"
               ></p>
-              <p class="mb-0">
+              <p class="mb-3">
                 Consultation fee:
                 <strong
                   >₹<span th:text="${doctor.consultationFee}"></span
                 ></strong>
               </p>
+
+              <!-- Availability: the days this doctor consults -->
+              <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="small text-muted">Consults on:</span>
+                <span
+                  class="badge rounded-pill text-bg-light border"
+                  th:each="s : ${schedules}"
+                >
+                  <span th:text="${s.dayOfWeek}"></span>
+                  <span
+                    class="text-muted fw-normal"
+                    th:text="' ' + ${#temporals.format(s.startTime, 'HH:mm')} + '–' + ${#temporals.format(s.endTime, 'HH:mm')}"
+                  ></span>
+                </span>
+                <span
+                  class="small text-muted fst-italic"
+                  th:if="${#lists.isEmpty(schedules)}"
+                >
+                  No schedule set — contact the hospital
+                </span>
+              </div>
             </div>
           </div>
 
           <!-- STEP 1: pick a date (GET form — resubmits to this same page with slots) -->
           <div class="card shadow-sm mb-3">
             <div class="card-body">
-              <h6 class="card-subtitle mb-3 text-muted">
-                Step 1 — Choose a date
-              </h6>
+              <h6 class="card-subtitle mb-3 text-muted">Choose a date</h6>
               <form
                 th:action="@{/patient/book}"
                 method="get"
@@ -69,7 +89,7 @@
           <div class="card shadow-sm" th:if="${date != null}">
             <div class="card-body">
               <h6 class="card-subtitle mb-3 text-muted">
-                Step 2 — Available slots on
+                Available slots on
                 <span
                   th:text="${#temporals.format(date, 'dd MMM yyyy')}"
                 ></span>
