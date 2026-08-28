@@ -1,3 +1,5 @@
+![banner](docs/images/home.png)
+
 # 🏥 Hospital Appointment & Patient Record System
 
 A full-stack web application for managing hospital appointments and patient records, built with Spring Boot. Patients book appointments with doctors,doctors manage their schedules and write prescriptions, and administrators manage doctors, departments, and patient records — with role-based access control throughout.
@@ -14,14 +16,8 @@ A full-stack web application for managing hospital appointments and patient reco
 
 - A Gmail account with 2-Step Verification enabled, for sending OTP emails
 
-
-### Clone the repo
-
-```bash
-git clone https://github.com/voidsnax/hospital-appointment-system.git
-```
-
 ### Create the database
+
 Using the MySQL client of your choice (Workbench, DBeaver, VS Code extension,
 or the mysql CLI):
 
@@ -46,34 +42,39 @@ MAIL_PASSWORD=<16-char Gmail App Password>
 # APP_ADMIN_EMAIL=admin@hospital.com
 # APP_ADMIN_PASSWORD=<admin-password>
 ```
-*About the Gmail App Password: with 2-Step Verification enabled on the
+
+_About the Gmail App Password: with 2-Step Verification enabled on the
 account, generate one at https://myaccount.google.com/apppasswords.
-This is not the account's normal login password.*
+This is not the account's normal login password._
 
 ### Run
 
 ```bash
+git clone https://github.com/voidsnax/hospital-appointment-system.git
+cd hospital-appointment-system
 ./mvnw spring-boot:run
 ```
 
-*On first start Hibernate creates all tables (ddl-auto: update) and the
+_On first start Hibernate creates all tables (ddl-auto: update) and the
 data seeder creates the admin account, four departments, four demo doctors
-with weekly schedules, and one demo patient.*
+with weekly schedules, and one demo patient._
 
 Open http://localhost:8080
 
+_The app listens on all interfaces — accessible at `http://<your-lan-ip>:8080` from other devices on the network_
+
 ### Demo Accounts
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Admin | admin@hospital.com | Admin@123 |
-| Doctor | doctor@hospital.com | Doctor@123 |
+| Role    | Email                | Password    |
+| ------- | -------------------- | ----------- |
+| Admin   | admin@hospital.com   | Admin@123   |
+| Doctor  | doctor@hospital.com  | Doctor@123  |
 | Patient | patient@hospital.com | Patient@123 |
 
-*Seeded automatically on first start (configurable via .env for admin).
+_Seeded automatically on first start (configurable via .env for admin).
 Additional doctors: dr.ananya@…, dr.sarah@…, dr.arjun@… (same password).
 Registration and password-reset OTP emails are sent to the address you
-enter — use a real inbox when testing those flows.*
+enter — use a real inbox when testing those flows._
 
 ## Features
 
@@ -119,6 +120,67 @@ enter — use a real inbox when testing those flows.*
 
 - View/cancel any appointment
 
+### Screenshots
+
+<div align="center">
+  <p style="font-weight: 600; font-size: 1.1em;">Admin Dashboard</p>
+  <img src="docs/images/admin-dashboard.png">
+</div>
+
+<table>
+  <tr>
+    <td align="center" style="font-weight: 600;">Manage Doctors</td>
+    <td align="center" style="font-weight: 600;">Manage Departments</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/admin-doctors.png"></td>
+    <td width="50%"><img src="docs/images/admin-departments.png"></td>
+  </tr>
+  <tr>
+    <td align="center" style="font-weight: 600;">Manage Patients</td>
+    <td align="center" style="font-weight: 600;">Manage Appointments</td>
+  </tr>
+    <td width="50%"><img src="docs/images/admin-patients.png"></td>
+    <td width="50%"><img src="docs/images/admin-appointments.png"></td>
+  </tr>
+</table>
+
+<br>
+
+<div align="center">
+  <p style="font-weight: 600; font-size: 1.1em;">Doctor Dashboard</p>
+  <img src="docs/images/doctor-dashboard.png">
+</div>
+
+<table>
+  <tr>
+    <td align="center" style="font-weight: 600;">Manage Appointments</td>
+    <td align="center" style="font-weight: 600;">Manage Prescriptions</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/doctor-appointments.png"></td>
+    <td width="50%"><img src="docs/images/doctor-prescriptions.png"></td>
+  </tr>
+</table>
+
+<br>
+
+<div align="center">
+  <p style="font-weight: 600; font-size: 1.1em;">Patient Dashboard</p>
+  <img src="docs/images/patient-dashboard.png">
+</div>
+
+<table>
+  <tr>
+    <td align="center" style="font-weight: 600;">Book Appointments</td>
+    <td align="center" style="font-weight: 600;">View/download Prescriptions</td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/images/booking.png"></td>
+    <td width="50%"><img src="docs/images/prescriptions.png"></td>
+  </tr>
+</table>
+
 ### Security & Access Control
 
 - Role-based access (PATIENT / DOCTOR / ADMIN) enforced by Spring Security
@@ -135,30 +197,28 @@ enter — use a real inbox when testing those flows.*
 
 ## Tech Stack
 
-| Layer | Technology |
-| --- | --- |
-| Language | Java 25 |
+| Layer     | Technology                                                         |
+| --------- | ------------------------------------------------------------------ |
+| Language  | Java 25                                                            |
 | Framework | Spring Boot 3.5 (Spring Web, Security, Data JPA, Validation, Mail) |
-| Database | MySQL 8.4 |
-| ORM | Hibernate via Spring Data JPA |
-| Templates | Thymeleaf |
-| UI | Bootstrap 5 |
-| Build | Maven |
-
+| Database  | MySQL 8.4                                                          |
+| ORM       | Hibernate via Spring Data JPA                                      |
+| Templates | Thymeleaf                                                          |
+| UI        | Bootstrap 5                                                        |
+| Build     | Maven                                                              |
 
 ## Project Set Up
 
 The skeleton was generated with the official [Spring Initializr](https://start.spring.io) (also available inside VS Code via the Spring Boot
 Extension Pack):
 
-*You can either generate the project from the website and extract the folder, or in VS Code press `Ctrl+Shift+P`, select **Spring Initializr: Create a Maven Project**, and follow the prompts.*
+_You can either generate the project from the website and extract the folder, or in VS Code press `Ctrl+Shift+P`, select **Spring Initializr: Create a Maven Project**, and follow the prompts._
 
-| Setting | Value |
-|---|---|
-| Project | Maven · Java · Jar packaging |
+| Setting          | Value                                                            |
+| ---------------- | ---------------------------------------------------------------- |
+| Project          | Maven · Java · Jar packaging                                     |
 | Group / Artifact | `com.hospital` / `hospital-system` (package: `com.hospital.app`) |
-| Spring Boot | 4.1.1 |
-
+| Spring Boot      | 4.1.1                                                            |
 
 ### Dependencies selected
 
@@ -171,7 +231,6 @@ Extension Pack):
 - Lombok — removes getter/setter boilerplate
 - Spring Boot DevTools — hot reload during development
 - Java Mail Sender — OTP emails via SMTP
-
 
 ## Project Structure
 
@@ -186,49 +245,48 @@ src/main/java/com/hospital/app/
 └── service/       # Business logic (booking, OTP, prescriptions, admin ops)
 src/main/resources/
 ├── templates/     # Thymeleaf views (per role + fragments + error pages)
-|── static/        # favicon
+|── static/        # favicon, custom styles
 └── application.yml
 ```
 
 ## Design Notes
 
 - Appointment state machine: PENDING → CONFIRMED → COMPLETED
-(or CANCELLED at PENDING/CONFIRMED); transitions validated server-side.
+  (or CANCELLED at PENDING/CONFIRMED); transitions validated server-side.
 
 - Slot availability: 30-minute slots from each doctor's weekly schedule,
-minus booked slots, minus past slots (1h lead time for same-day booking).
+  minus booked slots, minus past slots (1h lead time for same-day booking).
 
 - Cancellation rules: patients >2 hours before the slot; admin any time;
-doctors may reject pending/confirmed appointments.
+  doctors may reject pending/confirmed appointments.
 
 - Business rules live in the service layer (AppointmentService,
-PrescriptionService, OtpService...), not in controllers.
+  PrescriptionService, OtpService...), not in controllers.
 
 - Emails: OTP verification (registration) and password-reset codes are
-sent through Gmail SMTP by a dedicated EmailService.
+  sent through Gmail SMTP by a dedicated EmailService.
 
 ## Known Limitations (Future Improvements)
 
-- improved or more polished UI
+- Improved or more polished UI
 
 - OTP emails from Gmail SMTP frequently land in recipients' spam folders
-(no custom domain / SPF / DKIM). Production would use a transactional
-email provider with a verified domain.
+  (no custom domain / SPF / DKIM). Production would use a transactional
+  email provider with a verified domain.
 
 - OTP codes are stored unhashed; no per-OTP purpose column (a single
-active code per email makes this safe in practice).
+  active code per email makes this safe in practice).
 
 - No rate limiting on OTP resend / verification attempts.
 
 - Password-reset mails to non-existent inboxes silently bounce
-(no bounce processing).
+  (no bounce processing).
 
 - Consultations can be completed on any date (no on/after-date check).
 
 - Payment is modeled as a fee field only; no payment gateway (out of scope).
 
 - Deleting a doctor with appointment history is blocked (to preserve
-patient records) — production would soft-delete/deactivate instead.
+  patient records) — production would soft-delete/deactivate instead.
 
 - No audit logging; no automated tests yet.
-
