@@ -9,29 +9,36 @@ A full-stack web application for managing hospital appointments and patient reco
 ### Prerequisites
 
 - JDK 17 or newer
-
 - MySQL 8.x or newer (running locally)
-
-- Maven (or just use the included Maven wrapper ./mvnw)
-
+- Maven (or just use the included Maven wrapper `./mvnw`)
 - A Gmail account with 2-Step Verification enabled, for sending OTP emails
+
+### Clone the repo
+
+```bash
+git clone https://github.com/voidsnax/hospital-appointment-system.git
+cd hospital-appointment-system
+```
 
 ### Create the database
 
-Using the MySQL client of your choice (Workbench, DBeaver, VS Code extension,
-or the mysql CLI):
+Connect to your MySQL server as the root user (any MySQL client works),
+and run the following SQL.
 
 ```sql
-CREATE DATABASE hospital_db;
+CREATE DATABASE hospital_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'hospital_user'@'%' IDENTIFIED BY '<your-db-password>';
 GRANT ALL PRIVILEGES ON hospital_db.* TO 'hospital_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-Configure credentials — create a .env file in the project root:
+### Configure credentials
+
+Create a `.env` file in the project root with the following content.
+
+`DB_PASSWORD` must be the same password you chose when creating the database.
 
 ```text
-# should use the same pass when user is created
 DB_PASSWORD=<your-db-password>
 
 # Gmail account used to SEND the OTP emails
@@ -45,13 +52,12 @@ MAIL_PASSWORD=<16-char Gmail App Password>
 
 _About the Gmail App Password: with 2-Step Verification enabled on the
 account, generate one at https://myaccount.google.com/apppasswords.
-This is not the account's normal login password._
+This is not the account's normal login password — and remove any spaces
+from the 16 characters before pasting it here._
 
-### Run
+### Run the application
 
 ```bash
-git clone https://github.com/voidsnax/hospital-appointment-system.git
-cd hospital-appointment-system
 ./mvnw spring-boot:run
 ```
 
@@ -59,7 +65,7 @@ _On first start Hibernate creates all tables (ddl-auto: update) and the
 data seeder creates the admin account, four departments, four demo doctors
 with weekly schedules, and one demo patient._
 
-Open http://localhost:8080
+**Open http://localhost:8080**
 
 _The app listens on all interfaces — accessible at `http://<your-lan-ip>:8080` from other devices on the network_
 
@@ -81,43 +87,28 @@ enter — use a real inbox when testing those flows._
 ### Patient
 
 - Register with email verification (OTP)
-
 - Login / logout, forgot password (email OTP reset)
-
 - Browse doctors, filter by department
-
 - Book appointments in available time slots
-
 - View appointment history, cancel appointments (>2 hours before slot)
-
 - View and print prescriptions
-
 - Maintain basic profile (DOB, gender, blood group, address, emergency contact)
 
 ### Doctor
 
 - Dashboard: today's schedule, pending requests, completed-today stats
-
 - Confirm / reject appointment requests
-
 - Complete consultations and write prescriptions (diagnosis + medicines)
-
 - Edit their own prescriptions
-
 - View appointment history
 
 ### Admin
 
 - Dashboard with reports (appointments by department / by status)
-
 - Manage doctors (add / edit / delete), assign login credentials
-
 - Manage departments (add / edit / delete with referential-integrity guards)
-
 - Manage doctor weekly schedules (drives available booking slots)
-
 - Browse patient records: profile, appointment history, prescriptions
-
 - View/cancel any appointment
 
 ### Screenshots
@@ -193,15 +184,10 @@ enter — use a real inbox when testing those flows._
 ### Security & Access Control
 
 - Role-based access (PATIENT / DOCTOR / ADMIN) enforced by Spring Security
-
 - BCrypt password hashing
-
 - Email OTP verification for registration and password reset
-
 - Math captcha on registration
-
 - Ownership checks on every record (patients see only their data,doctors only their consultations)
-
 - CSRF protection on all forms
 
 ## Tech Stack
@@ -262,40 +248,28 @@ src/main/resources/
 
 - Appointment state machine: PENDING → CONFIRMED → COMPLETED
   (or CANCELLED at PENDING/CONFIRMED); transitions validated server-side.
-
 - Slot availability: 30-minute slots from each doctor's weekly schedule,
   minus booked slots, minus past slots (1h lead time for same-day booking).
-
 - Cancellation rules: patients >2 hours before the slot; admin any time;
   doctors may reject pending/confirmed appointments.
-
 - Business rules live in the service layer (AppointmentService,
   PrescriptionService, OtpService...), not in controllers.
-
 - Emails: OTP verification (registration) and password-reset codes are
   sent through Gmail SMTP by a dedicated EmailService.
 
 ## Known Limitations (Future Improvements)
 
 - Improved or more polished UI
-
 - OTP emails from Gmail SMTP frequently land in recipients' spam folders
   (no custom domain / SPF / DKIM). Production would use a transactional
   email provider with a verified domain.
-
 - OTP codes are stored unhashed; no per-OTP purpose column (a single
   active code per email makes this safe in practice).
-
 - No rate limiting on OTP resend / verification attempts.
-
 - Password-reset mails to non-existent inboxes silently bounce
   (no bounce processing).
-
 - Consultations can be completed on any date (no on/after-date check).
-
 - Payment is modeled as a fee field only; no payment gateway (out of scope).
-
 - Deleting a doctor with appointment history is blocked (to preserve
   patient records) — production would soft-delete/deactivate instead.
-
-- No audit logging; no automated tests yet.
+- No audit logging, no automated tests yet.
