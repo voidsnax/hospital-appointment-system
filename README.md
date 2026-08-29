@@ -23,7 +23,7 @@ cd hospital-appointment-system
 ### Create the database
 
 Connect to your MySQL server as the root user (any MySQL client works),
-and run the following SQL.
+and run the following SQL:
 
 ```sql
 CREATE DATABASE hospital_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -36,7 +36,7 @@ FLUSH PRIVILEGES;
 
 Create a `.env` file in the project root with the following content.
 
-`DB_PASSWORD` must be the same password you chose when creating the database.
+`DB_PASSWORD` must be the same password you chose when creating the database:
 
 ```text
 DB_PASSWORD=<your-db-password>
