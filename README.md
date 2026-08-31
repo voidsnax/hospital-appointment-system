@@ -2,7 +2,7 @@
 
 # 🏥 Hospital Appointment & Patient Record System
 
-A full-stack web application for managing hospital appointments and patient records, built with Spring Boot. Patients book appointments with doctors,doctors manage their schedules and write prescriptions, and administrators manage doctors, departments, and patient records — with role-based access control throughout.
+A full-stack web application for managing hospital appointments and patient records, built with Spring Boot. Patients book appointments with doctors, doctors manage their consultations and write prescriptions, and administrators manage doctors, departments, and patient records — with role-based access control throughout.
 
 ## Getting Started
 
@@ -130,7 +130,7 @@ enter — use a real inbox when testing those flows._
     </td>
   </tr>
   <tr>
-    <th>Manage Patients</th>
+    <th>View Patient Records</th>
     <th>Manage Appointments</th>
   </tr>
   <tr>
@@ -273,4 +273,3 @@ src/main/resources/
 - Deleting a doctor with appointment history is blocked (to preserve
   patient records) — production would soft-delete/deactivate instead.
 - No audit logging and no automated tests yet.
-- The UI is functional but could be further polished.
