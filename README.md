@@ -192,15 +192,15 @@ enter — use a real inbox when testing those flows._
 
 ## Tech Stack
 
-| Layer     | Technology                                                         |
-| --------- | ------------------------------------------------------------------ |
-| Language  | Java 25                                                            |
-| Framework | Spring Boot 3.5 (Spring Web, Security, Data JPA, Validation, Mail) |
-| Database  | MySQL 8.4                                                          |
-| ORM       | Hibernate via Spring Data JPA                                      |
-| Templates | Thymeleaf                                                          |
-| UI        | Bootstrap 5                                                        |
-| Build     | Maven                                                              |
+| Layer     | Technology                                |
+| --------- | ----------------------------------------- |
+| Language  | Java 17+ (Developed and tested on JDK 25) |
+| Framework | Spring Boot 4.1.1                         |
+| Database  | MySQL 8.4                                 |
+| ORM       | Hibernate via Spring Data JPA             |
+| Templates | Thymeleaf                                 |
+| UI        | Bootstrap 5                               |
+| Build     | Maven                                     |
 
 ## Project Set Up
 
@@ -231,17 +231,17 @@ _You can either generate the project from the website and extract the folder, or
 
 ```text
 src/main/java/com/hospital/app/
-├── config/        # Security config, data seeders
-├── controller/    # Web controllers (auth, patient, doctor, admin)
-├── dto/           # Form-binding objects (registration)
-├── entity/        # JPA entities (User, Doctor, Appointment, Prescription...)
-├── repository/    # Spring Data JPA repositories
-├── security/      # Custom UserDetailsService (DB-backed auth)
-└── service/       # Business logic (booking, OTP, prescriptions, admin ops)
+├── config/          # Security config, data seeders
+├── controller/      # Web controllers (auth, patient, doctor, admin)
+├── dto/             # Form-binding objects (registration)
+├── entity/          # JPA entities (User, Doctor, Appointment, Prescription...)
+├── repository/      # Spring Data JPA repositories
+├── security/        # Custom UserDetailsService (DB-backed auth)
+└── service/         # Business logic (booking, OTP, prescriptions, admin ops)
 src/main/resources/
-├── templates/     # Thymeleaf views (per role + fragments + error pages)
-|── static/        # favicon, custom styles
-└── application.yml
+├── templates/       # Thymeleaf views (per role + fragments + error pages)
+├── static/          # favicon, custom styles
+└── application.yml  # App config: database, mail, JPA settings
 ```
 
 ## Design Notes
@@ -249,7 +249,7 @@ src/main/resources/
 - Appointment state machine: PENDING → CONFIRMED → COMPLETED
   (or CANCELLED at PENDING/CONFIRMED); transitions validated server-side.
 - Slot availability: 30-minute slots from each doctor's weekly schedule,
-  minus booked slots, minus past slots (1h lead time for same-day booking).
+  minus booked slots, minus same-day slots starting within the next hour (1h lead time for same-day booking).
 - Cancellation rules: patients >2 hours before the slot; admin any time;
   doctors may reject pending/confirmed appointments.
 - Business rules live in the service layer (AppointmentService,
@@ -259,17 +259,18 @@ src/main/resources/
 
 ## Known Limitations (Future Improvements)
 
-- Improved or more polished UI
 - OTP emails from Gmail SMTP frequently land in recipients' spam folders
-  (no custom domain / SPF / DKIM). Production would use a transactional
+  (no custom domain / SPF / DKIM); production would use a transactional
   email provider with a verified domain.
-- OTP codes are stored unhashed; no per-OTP purpose column (a single
-  active code per email makes this safe in practice).
+- OTP codes are stored unhashed in the database (production would hash them like passwords).
+- OTPs do not track their purpose (registration vs password reset); the single active code per email rule
+  prevents cross-flow misuse, but a purpose column would be more explicit.
 - No rate limiting on OTP resend / verification attempts.
 - Password-reset mails to non-existent inboxes silently bounce
   (no bounce processing).
 - Consultations can be completed on any date (no on/after-date check).
-- Payment is modeled as a fee field only; no payment gateway (out of scope).
+- Payment is modeled as a fee field only — no payment gateway (out of scope).
 - Deleting a doctor with appointment history is blocked (to preserve
   patient records) — production would soft-delete/deactivate instead.
-- No audit logging, no automated tests yet.
+- No audit logging and no automated tests yet.
+- The UI is functional but could be further polished.
