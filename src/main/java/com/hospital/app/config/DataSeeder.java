@@ -6,7 +6,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -23,10 +22,8 @@ public class DataSeeder {
     @Value("${app.admin.password:Admin@123}")
     private String adminPassword;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    @Value("${app.seed.demo:true}")
+    private boolean seedDemo;
 
     @Bean
     public CommandLineRunner seedData(UserRepository userRepository,
@@ -39,6 +36,12 @@ public class DataSeeder {
             // ---------- 1. Users ----------
             ensureUser(userRepository, encoder, adminEmail, "System Administrator",
                     "9000000001", adminPassword, Role.ADMIN);
+
+            if (!seedDemo) {
+                System.out.println(">>> Demo seeding disabled — only admin created.");
+                return;
+            }
+
             ensureUser(userRepository, encoder, "patient@hospital.com", "Test Patient", "9000000003", "Patient@123",
                     Role.PATIENT);
 
@@ -52,18 +55,14 @@ public class DataSeeder {
                     "Doctor@123", Role.DOCTOR);
 
             // ---------- 2. Departments ----------
-            if (departmentRepository.count() == 0) {
-                departmentRepository.saveAll(List.of(
-                        department("Cardiology", "Heart and blood vessel care"),
-                        department("General Medicine", "Primary care and general consultations"),
-                        department("Dermatology", "Skin, hair and nail care"),
-                        department("Pediatrics", "Health care for children")));
-                System.out.println(">>> Seeded 4 departments");
-            }
-            Department general = departmentRepository.findByName("General Medicine").orElseThrow();
-            Department cardio = departmentRepository.findByName("Cardiology").orElseThrow();
-            Department derma = departmentRepository.findByName("Dermatology").orElseThrow();
-            Department pediat = departmentRepository.findByName("Pediatrics").orElseThrow();
+            Department general = ensureDepartment(departmentRepository, "General Medicine",
+                    "Primary care and general consultations");
+            Department cardio = ensureDepartment(departmentRepository, "Cardiology",
+                    "Heart and blood vessel care");
+            Department derma = ensureDepartment(departmentRepository, "Dermatology",
+                    "Skin, hair and nail care");
+            Department pediat = ensureDepartment(departmentRepository, "Pediatrics",
+                    "Health care for children");
 
             // ---------- 3. Doctor profiles ----------
             Doctor d1 = ensureDoctor(doctorRepository, u1, general, "General Physician", "MBBS, MD",
@@ -111,13 +110,6 @@ public class DataSeeder {
         });
     }
 
-    private Department department(String name, String description) {
-        Department d = new Department();
-        d.setName(name);
-        d.setDescription(description);
-        return d;
-    }
-
     private Doctor ensureDoctor(DoctorRepository repo, User user, Department dept,
             String specialization, String qualification, BigDecimal fee) {
         return repo.findByUserId(user.getId()).orElseGet(() -> {
@@ -129,6 +121,17 @@ public class DataSeeder {
             d.setConsultationFee(fee);
             repo.save(d);
             System.out.println(">>> Seeded doctor profile for " + user.getEmail());
+            return d;
+        });
+    }
+
+    private Department ensureDepartment(DepartmentRepository repo, String name, String description) {
+        return repo.findByName(name).orElseGet(() -> {
+            Department d = new Department();
+            d.setName(name);
+            d.setDescription(description);
+            repo.save(d);
+            System.out.println(">>> Seeded department: " + name);
             return d;
         });
     }

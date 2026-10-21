@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -27,7 +29,7 @@ public class SecurityConfig {
                 // Everything else: any logged-in user
                 .anyRequest().authenticated())
                 .formLogin(form -> form
-                        .loginPage("/login") // our custom login page (GET)
+                        .loginPage("/login") // custom login page (GET)
                         .loginProcessingUrl("/login") // where the form POSTs
                         .usernameParameter("email") // form field name for username
                         .passwordParameter("password") // form field name for password
@@ -71,5 +73,10 @@ public class SecurityConfig {
             }
             response.sendRedirect("/login?error");
         };
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
