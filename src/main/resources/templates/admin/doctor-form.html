@@ -65,7 +65,7 @@
                       th:value="${doctor != null} ? ${doctor.user.phone} : ''"
                     />
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-6 mb-3" th:if="${doctor == null}">
                     <label class="form-label">Password (min 8 chars)</label>
                     <div class="input-group">
                       <input
