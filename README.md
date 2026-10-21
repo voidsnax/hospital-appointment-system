@@ -67,8 +67,8 @@ from the 16 characters before pasting it here._
 
 _On first start Hibernate creates all tables (ddl-auto: update) and the
 data seeder creates the admin account, four departments, four demo doctors
-with weekly schedules, and one demo patient.
-Set APP_SEED_DEMO=false in .env before first run to skip the demo doctors/patient/departments. Only the admin account is created — use the admin UI to add departments, doctors, and schedules yourself_
+with weekly schedules, and one demo patient.   
+Set APP_SEED_DEMO=false in .env before first run to skip the demo doctors/patient/departments. Only the admin account is created — use the admin UI to add departments, doctors, and schedules yourself._
 
 **Open http://localhost:8080**
 
