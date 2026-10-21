@@ -27,7 +27,7 @@ and run the following SQL:
 
 ```sql
 CREATE DATABASE hospital_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'hospital_user'@'%' IDENTIFIED BY '<your-db-password>';
+CREATE USER 'hospital_user'@'%' IDENTIFIED BY 'Hospital#Pass';
 GRANT ALL PRIVILEGES ON hospital_db.* TO 'hospital_user'@'%';
 FLUSH PRIVILEGES;
 ```
@@ -39,7 +39,7 @@ Create a `.env` file in the project root with the following content.
 `DB_PASSWORD` must be the same password you chose when creating the database:
 
 ```text
-DB_PASSWORD=<your-db-password>
+DB_PASSWORD=Hospital#Pass
 
 # Gmail account used to SEND the OTP emails
 MAIL_USERNAME=<yourgmail@gmail.com>
@@ -48,6 +48,10 @@ MAIL_PASSWORD=<16-char Gmail App Password>
 # Optional: override the seeded admin account
 # APP_ADMIN_EMAIL=admin@hospital.com
 # APP_ADMIN_PASSWORD=<admin-password>
+
+# Seed demo data (patient, doctors, departments, schedules) on first start.
+# Set to false to bootstrap only the admin account.
+APP_SEED_DEMO=true
 ```
 
 _About the Gmail App Password: with 2-Step Verification enabled on the
@@ -63,7 +67,8 @@ from the 16 characters before pasting it here._
 
 _On first start Hibernate creates all tables (ddl-auto: update) and the
 data seeder creates the admin account, four departments, four demo doctors
-with weekly schedules, and one demo patient._
+with weekly schedules, and one demo patient.
+Set APP_SEED_DEMO=false in .env before first run to skip the demo doctors/patient/departments. Only the admin account is created — use the admin UI to add departments, doctors, and schedules yourself_
 
 **Open http://localhost:8080**
 
@@ -273,3 +278,7 @@ src/main/resources/
 - Deleting a doctor with appointment history is blocked (to preserve
   patient records) — production would soft-delete/deactivate instead.
 - No audit logging and no automated tests yet.
+- Two patients booking the exact same time slot at the same instant could
+  both succeed (a "race condition"). The app checks slot availability just
+  before saving, but under real concurrent load a proper lock would be
+  needed. Rare in normal use.
