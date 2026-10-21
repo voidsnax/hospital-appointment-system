@@ -55,6 +55,7 @@
               >
                 No active code found. Please request a new one.
               </div>
+              <div class="alert alert-danger py-2" th:if="${resendError}" th:text="${resendError}"></div>
 
               <form th:action="@{/verify-otp}" method="post">
                 <div class="mb-3">

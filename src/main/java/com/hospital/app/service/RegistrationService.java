@@ -31,6 +31,12 @@ public class RegistrationService {
             throw new IllegalArgumentException("This email is already registered.");
         }
 
+        Optional<User> phoneOwner = userRepository.findByPhone(phone);
+        if (phoneOwner.isPresent()
+                && (existing.isEmpty() || !phoneOwner.get().getId().equals(existing.get().getId()))) {
+            throw new IllegalArgumentException("This phone number is already registered.");
+        }
+
         // Reuse the pending (unverified) row, or create a fresh one
         User user = existing.orElseGet(User::new);
         user.setFullName(fullName);

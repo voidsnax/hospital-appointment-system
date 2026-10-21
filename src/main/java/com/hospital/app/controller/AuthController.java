@@ -94,11 +94,15 @@ public class AuthController {
             model.addAttribute("error", e.getMessage());
             generateCaptcha(model, session);
             return "register";
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", "Could not send verification email. Please try again in a moment.");
+            generateCaptcha(model, session);
+            return "register";
         }
 
-        // NEW: remember the email server-side instead of passing it in the URL
+        // remember the email server-side instead of passing it in the URL
         session.setAttribute("pendingEmail", registerDto.getEmail());
-        return "redirect:/verify-otp"; // clean URL
+        return "redirect:/verify-otp";
     }
 
     @GetMapping("/verify-otp")
@@ -150,6 +154,10 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             ra.addFlashAttribute("error", e.getMessage());
             return "redirect:/register";
+        } catch (IllegalStateException e) {
+            ra.addFlashAttribute("resendError",
+                    "Could not send verification email. Please try again in a moment.");
+            return "redirect:/verify-otp";
         }
     }
 
