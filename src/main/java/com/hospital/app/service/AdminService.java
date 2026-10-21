@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Optional;
 
 @Service
 public class AdminService {
@@ -42,6 +43,13 @@ public class AdminService {
             BigDecimal fee) {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email already in use: " + email);
+        }
+        if (rawPassword == null || rawPassword.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters.");
+        }
+
+        if (userRepository.findByPhone(phone).isPresent()) {
+            throw new IllegalArgumentException("This phone number is already registered.");
         }
 
         User user = new User();
@@ -80,6 +88,11 @@ public class AdminService {
         if (!user.getEmail().equals(email) && userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Email already in use: " + email);
         }
+        Optional<User> phoneOwner = userRepository.findByPhone(phone);
+        if (phoneOwner.isPresent() && !phoneOwner.get().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("This phone number is already in use.");
+        }
+
         user.setFullName(fullName);
         user.setEmail(email);
         user.setPhone(phone);
@@ -104,9 +117,10 @@ public class AdminService {
                     "Cannot delete: this doctor has appointments in the system (patient history must be preserved).");
         }
 
+        User user = doctor.getUser();
         scheduleRepository.deleteAll(scheduleRepository.findByDoctorId(doctorId));
         doctorRepository.delete(doctor);
-        userRepository.delete(doctor.getUser()); // login account goes too
+        userRepository.delete(user); // login account goes too
     }
 
     @Transactional
@@ -153,6 +167,13 @@ public class AdminService {
         }
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new IllegalArgumentException("Doctor not found."));
+        for (DoctorSchedule existing : scheduleRepository.findByDoctorIdAndDayOfWeek(doctorId, dayOfWeek)) {
+            if (!end.isBefore(existing.getStartTime())
+                    && !start.isAfter(existing.getEndTime())) {
+                throw new IllegalArgumentException(
+                        "This schedule overlaps an existing one for that day.");
+            }
+        }
         DoctorSchedule s = new DoctorSchedule();
         s.setDoctor(doctor);
         s.setDayOfWeek(dayOfWeek);
