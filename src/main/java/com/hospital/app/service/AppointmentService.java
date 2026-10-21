@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
@@ -31,16 +32,16 @@ public class AppointmentService {
     private static final int SAME_DAY_LEAD_HOURS = 1;
 
     // These statuses "occupy" a slot. CANCELLED frees it up again.
-    private static final List<AppointmentStatus> SLOT_BLOCKING_STATUSES =
-            List.of(AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED, AppointmentStatus.COMPLETED);
+    private static final List<AppointmentStatus> SLOT_BLOCKING_STATUSES = List.of(AppointmentStatus.PENDING,
+            AppointmentStatus.CONFIRMED, AppointmentStatus.COMPLETED);
 
     private final AppointmentRepository appointmentRepository;
     private final DoctorRepository doctorRepository;
     private final DoctorScheduleRepository scheduleRepository;
 
     public AppointmentService(AppointmentRepository appointmentRepository,
-                              DoctorRepository doctorRepository,
-                              DoctorScheduleRepository scheduleRepository) {
+            DoctorRepository doctorRepository,
+            DoctorScheduleRepository scheduleRepository) {
         this.appointmentRepository = appointmentRepository;
         this.doctorRepository = doctorRepository;
         this.scheduleRepository = scheduleRepository;
@@ -56,9 +57,9 @@ public class AppointmentService {
             return List.of();
         }
 
-        List<DoctorSchedule> schedules =
-                scheduleRepository.findByDoctorIdAndDayOfWeek(doctorId, date.getDayOfWeek());
-        if (schedules.isEmpty()) return List.of();   // doctor doesn't work that day
+        List<DoctorSchedule> schedules = scheduleRepository.findByDoctorIdAndDayOfWeek(doctorId, date.getDayOfWeek());
+        if (schedules.isEmpty())
+            return List.of(); // doctor doesn't work that day
 
         @SuppressWarnings("null")
         Set<LocalTime> booked = appointmentRepository
@@ -67,13 +68,12 @@ public class AppointmentService {
                 .map(Appointment::getStartTime)
                 .collect(Collectors.toSet());
 
-        List<LocalTime> slots = new ArrayList<>();
+        Set<LocalTime> slots = new LinkedHashSet<>();
         LocalDateTime leadTime = LocalDateTime.now().plusHours(SAME_DAY_LEAD_HOURS);
 
         for (DoctorSchedule schedule : schedules) {
-            for (LocalTime t = schedule.getStartTime();
-                 t.plusMinutes(SLOT_DURATION_MINUTES).compareTo(schedule.getEndTime()) <= 0;
-                 t = t.plusMinutes(SLOT_DURATION_MINUTES)) {
+            for (LocalTime t = schedule.getStartTime(); t.plusMinutes(SLOT_DURATION_MINUTES)
+                    .compareTo(schedule.getEndTime()) <= 0; t = t.plusMinutes(SLOT_DURATION_MINUTES)) {
 
                 // same-day bookings must be at least 1 hour away
                 if (date.equals(LocalDate.now()) && !LocalDateTime.of(date, t).isAfter(leadTime)) {
@@ -84,18 +84,23 @@ public class AppointmentService {
                 }
             }
         }
-        return slots;
+        return new ArrayList<>(slots);
     }
 
     @Transactional
     public Appointment bookAppointment(User patient, Long doctorId, LocalDate date,
-                                       LocalTime slot, String reason) {
+            LocalTime slot, String reason) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new IllegalArgumentException("Doctor not found."));
 
         // Re-check INSIDE the transaction: the page may have loaded minutes ago
         if (!getAvailableSlots(doctorId, date).contains(slot)) {
             throw new IllegalArgumentException("That slot is no longer available. Please choose another.");
+        }
+
+        if (appointmentRepository.existsByPatientIdAndAppointmentDateAndStartTimeAndStatusIn(
+                patient.getId(), date, slot, SLOT_BLOCKING_STATUSES)) {
+            throw new IllegalArgumentException("You already have an appointment at this time.");
         }
 
         Appointment appointment = new Appointment();
@@ -124,7 +129,7 @@ public class AppointmentService {
         }
 
         LocalDateTime slotStart = LocalDateTime.of(appointment.getAppointmentDate(),
-                                                   appointment.getStartTime());
+                appointment.getStartTime());
         if (!slotStart.isAfter(LocalDateTime.now().plusHours(CANCEL_CUTOFF_HOURS))) {
             throw new IllegalArgumentException("Appointments can only be cancelled more than "
                     + CANCEL_CUTOFF_HOURS + " hours before the scheduled time.");
@@ -134,19 +139,20 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
-        // ---- Doctor actions ----
+    // ---- Doctor actions ----
 
     // The appointment state machine. Key = current status,
     // Value = the statuses you're allowed to move to.
     private static final Map<AppointmentStatus, Set<AppointmentStatus>> ALLOWED_TRANSITIONS = Map.of(
-            AppointmentStatus.PENDING,   EnumSet.of(AppointmentStatus.CONFIRMED, AppointmentStatus.CANCELLED),
+            AppointmentStatus.PENDING, EnumSet.of(AppointmentStatus.CONFIRMED, AppointmentStatus.CANCELLED),
             AppointmentStatus.CONFIRMED, EnumSet.of(AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED),
             AppointmentStatus.COMPLETED, EnumSet.noneOf(AppointmentStatus.class),
             AppointmentStatus.CANCELLED, EnumSet.noneOf(AppointmentStatus.class));
 
     @Transactional
     public void doctorUpdateStatus(Long appointmentId, Doctor doctor, AppointmentStatus newStatus) {
-        // Ownership enforced IN THE QUERY — doctor A can never touch doctor B's appointment
+        // Ownership enforced IN THE QUERY — doctor A can never touch doctor B's
+        // appointment
         Appointment appointment = appointmentRepository
                 .findByIdAndDoctorId(appointmentId, doctor.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found."));

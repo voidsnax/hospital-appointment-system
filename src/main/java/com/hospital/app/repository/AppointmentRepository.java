@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
         // Upcoming appointments for the dashboard
         List<Appointment> findByPatientIdAndStatusInAndAppointmentDateGreaterThanEqualOrderByAppointmentDateAscStartTimeAsc(
                         Long patientId, List<AppointmentStatus> statuses, LocalDate date);
+
+        // Patient Appointment clash check
+        boolean existsByPatientIdAndAppointmentDateAndStartTimeAndStatusIn(
+        Long patientId, LocalDate date, LocalTime startTime, List<AppointmentStatus> statuses);
 
         // ---- Doctor module methods ----
         long countByDoctorId(Long doctorId);
@@ -60,9 +65,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
         long countByStatus(AppointmentStatus status);
 
-        // Your FIRST hand-written queries — JPQL (Java Persistence Query Language).
-        // Reads like property navigation: appointment → doctor → department → name.
-        // Spring translates this into SQL with JOINs. Returns [label, count] pairs.
         @Query("SELECT a.doctor.department.name, COUNT(a) FROM Appointment a " +
                         "GROUP BY a.doctor.department.name ORDER BY COUNT(a) DESC")
         List<Object[]> countByDepartment();
