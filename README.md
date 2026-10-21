@@ -214,11 +214,11 @@ Extension Pack):
 
 _You can either generate the project from the website and extract the folder, or in VS Code press `Ctrl+Shift+P`, select **Spring Initializr: Create a Maven Project**, and follow the prompts._
 
-| Setting          | Value                                                            |
-| ---------------- | ---------------------------------------------------------------- |
-| Project          | Maven · Java · Jar packaging                                     |
-| Group / Artifact | `com.hospital` / `hospital-system` (package: `com.hospital.app`) |
-| Spring Boot      | 4.1.1                                                            |
+| Setting          | Value                                                                        |
+| ---------------- | ---------------------------------------------------------------------------- |
+| Project          | Maven · Java · Jar packaging                                                 |
+| Group / Artifact | `com.hospital` / `hospital-appointment-system` (package: `com.hospital.app`) |
+| Spring Boot      | 4.1.1                                                                        |
 
 ### Dependencies selected
 

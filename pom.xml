@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hospital</groupId>
-	<artifactId>hospital-system</artifactId>
+	<artifactId>hospital-appointment-system</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>hospital-system</name>
+	<name>hospital-appointment-system</name>
 	<description/>
 	<url/>
 	<licenses>

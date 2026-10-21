@@ -5,7 +5,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   application:
-    name: hospital-system
+    name: hospital-appointment-system
 
   # MySQL Database Connection
   datasource:
